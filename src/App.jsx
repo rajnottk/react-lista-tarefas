@@ -1,35 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [tarefa, setTarefa] = useState("");
+  const [tarefas, setTarefas] = useState([]);
+
+  useEffect(() => {
+    const tarefasSalvas = localStorage.getItem("tarefas");
+
+    if (tarefasSalvas) {
+      setTarefas(JSON.parse(tarefasSalvas));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("tarefas", JSON.stringify(tarefas));
+  }, [tarefas]);
+
+  function adicionarTarefa() {
+
+    if (tarefa === "") return;
+
+    const novaLista = [...tarefas, tarefa];
+
+    setTarefas(novaLista);
+    setTarefa("");
+  }
+
+  function removerTarefa(index) {
+
+    const novaLista = tarefas.filter((_, i) => i !== index);
+
+    setTarefas(novaLista);
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="container">
+
+      <h1>Lista de Tarefas</h1>
+
+      <div className="input-area">
+
+        <input
+          type="text"
+          placeholder="Digite uma tarefa..."
+          value={tarefa}
+          onChange={(e) => setTarefa(e.target.value)}
+        />
+
+        <button onClick={adicionarTarefa}>
+          Adicionar
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <ul>
+
+        {tarefas.map((item, index) => (
+
+          <li key={index}>
+
+            {item}
+
+            <button onClick={() => removerTarefa(index)}>
+              Remover
+            </button>
+
+          </li>
+
+        ))}
+
+      </ul>
+
+    </div>
+  );
 }
 
-export default App
+export default App;
